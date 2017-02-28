@@ -1,0 +1,27 @@
+declare -a MAGENTO_COMMANDS
+
+_magento()
+{
+    local cur prefix cmd opts
+
+    cmd=$1
+    if [ ${#MAGENTO_COMMANDS[@]} -eq 0 ]; then
+        MAGENTO_COMMANDS=`$cmd list --no-ansi | grep --perl-regexp --only-matching --color=never "(?<=\s)([^\s|\(]+)(?=[\s]{3})"`
+    fi
+
+    opts=${MAGENTO_COMMANDS}
+    for i in `seq 2 $COMP_CWORD`; do
+        if [ ${COMP_WORDS[$i]} = ':' ]; then
+            prefix="${COMP_WORDS[$i-1]}${COMP_WORDS[$i]}"
+            opts=`printf "%s\n" "${opts[@]}" | grep --perl-regexp --only-matching --color=never "(?<=$prefix).+"`
+        fi
+    done
+
+    cur=${COMP_WORDS[$COMP_CWORD]}
+    if [ ! -z $cur ] && [ $cur = ':' ]; then
+        cur=''
+    fi
+    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+}
+
+complete -o nospace -F _magento magento
