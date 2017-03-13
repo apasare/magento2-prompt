@@ -24,4 +24,4 @@ _magento()
     COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
 }
 
-complete -o nospace -F _magento magento
+complete -o dirnames -o nospace -F _magento magento
